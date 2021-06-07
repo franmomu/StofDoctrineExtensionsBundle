@@ -33,7 +33,7 @@ class LoggerListener implements EventSubscriberInterface
      */
     public function onKernelRequest(RequestEvent $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+        if (!$this->isMainRequest($event)) {
             return;
         }
 
@@ -53,5 +53,14 @@ class LoggerListener implements EventSubscriberInterface
         return array(
             KernelEvents::REQUEST => 'onKernelRequest',
         );
+    }
+
+    private function isMainRequest(RequestEvent $event): bool
+    {
+        if (method_exists($event, 'isMainRequest')) {
+            return $event->isMainRequest();
+        }
+
+        return $event->isMasterRequest();
     }
 }
